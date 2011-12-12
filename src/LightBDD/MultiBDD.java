@@ -59,6 +59,7 @@ public class MultiBDD
         ArrayList<Integer> inputsNoLongerUsed = new ArrayList(10);
         // Each one of f2's BDDs (outputs) may have an output feeding into f1
         assert(inputMapping.length == f2.getNumOutputs());
+        int numNewOutputs = 0;
         for (int j = 0; j < inputMapping.length; j++)
         {
             ArrayList<Integer> f2OutputTargets = inputMapping[j];
@@ -70,6 +71,7 @@ public class MultiBDD
                 if (target == -1)
                 {
                     newOutputs.add(f2Output);
+                    numNewOutputs++;
                 }
                 else
                 {
@@ -83,6 +85,8 @@ public class MultiBDD
         for (int i = 0; i < inputsNoLongerUsed.size(); i++)
         {
             f1NewOutput.tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+            if (i < numNewOutputs)
+                newOutputs.get(newOutputs.size() - i - 1).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
         }
         return f1NewOutput;
     }
@@ -107,5 +111,24 @@ public class MultiBDD
     public int getNumOutputs()
     {
         return bdds.size();
+    }
+    
+    public String printTruthTable()
+    {
+        String output = "";
+        ArrayList<boolean[]> inputs = Util.generateInputs(this.getNumInputs());
+        for (boolean[] in : inputs)
+        {
+            for (boolean v : in)
+            {
+                output += (v ? "T " : "F ");
+            }
+            output += ":";
+            boolean[] outs = this.execute(in);
+            for (boolean out : outs)
+                output += "  " + (out ? "T  " : "F  ");
+            output += "\n";
+        }
+        return output;
     }
 }
