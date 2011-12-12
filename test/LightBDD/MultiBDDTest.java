@@ -74,16 +74,6 @@ public class MultiBDDTest
         ArrayList<boolean[]> input3 = Util.generateInputs(3);
         outputXOR = new boolean[] { false, false, true, true, true, true, false, false };
         outputNAND = new boolean[] { false, true, false, true, true, true, true, true };
-        /*
-        for (boolean[] in : input3)
-        {
-            for (boolean v : in)
-            {
-                System.out.print((v ? "T " : "F "));
-            }
-            System.out.print("  " + (c.execute(in)[0] ? "T  " : "F  "));
-            System.out.print("  " + (c.execute(in)[1] ? "T\n" : "F\n"));
-        }*/
         for (int i = 0; i < input3.size(); i++)
         {
             boolean[] result = c.execute(input3.get(i));
