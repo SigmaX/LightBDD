@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author eric
+ * @author Eric 'Siggy' Scott
  */
 public class MultiBDDTest
 {
@@ -90,5 +90,34 @@ public class MultiBDDTest
             assertEquals(outputXOR[i], result[0]);
             assertEquals(outputNAND[i], result[1]);
         }
+        
+        // TEST1
+        MultiBDD n1 = new MultiBDD(BDD.Function.NAND);
+        MultiBDD n2 = new MultiBDD(BDD.Function.NAND);
+        MultiBDD n3 = new MultiBDD(BDD.Function.NAND);
+        MultiBDD mimic = new MultiBDD(BDD.Function.MIMIC);
+        inputMapping = new ArrayList[] { new ArrayList(2) };
+        inputMapping[0].add(0);
+        inputMapping[0].add(-1);
+        MultiBDD n12 = new MultiBDD(n2, n1, inputMapping);
+        inputMapping = new ArrayList[] { new ArrayList(2)};
+        inputMapping[0].add(1);
+        inputMapping[0].add(2);
+        // FIXME This operation causes an unintend input variable reordering (swaps 0 and 1).
+        MultiBDD n12m = new MultiBDD(n12, mimic, inputMapping);
+        System.out.println(n12m.bdds.get(0).toDot("A"));
+        System.out.println(n12m.bdds.get(1).toDot("B"));
+        inputMapping = new ArrayList[] { new ArrayList(1), new ArrayList(1) };
+        inputMapping[0].add(0);
+        inputMapping[1].add(1);
+        MultiBDD n123m = new MultiBDD(n3, n12m, inputMapping);
+        MultiBDD output = new MultiBDD(BDD.Function.TEST1);
+        ArrayList<boolean[]> input2 = Util.generateInputs(2);
+        for (int i = 0; i < input2.size(); i++)
+        {
+            boolean[] result = n123m.execute(input2.get(i));
+            assertEquals(output.execute(input2.get(i))[0], result[0]);
+        }
+        
     }
 }
