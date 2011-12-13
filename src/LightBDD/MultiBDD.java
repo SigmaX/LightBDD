@@ -47,6 +47,11 @@ public class MultiBDD
             this.bdds.add(b);
         for (BDD b : oldOutputs)
             this.bdds.add(b);
+        
+        for (int i = 1; i < this.getNumOutputs(); i++)
+        {
+            assert(this.bdds.get(i-1).tree.getNumInputs() == this.bdds.get(i).tree.getNumInputs());
+        }
     }
     
     /**
@@ -57,6 +62,7 @@ public class MultiBDD
         BDD f1NewOutput = new BDD(f1Output); // Deep copy to avoid side effects
         f1NewOutput.preConcatonateInputs(f2.getNumInputs());
         ArrayList<Integer> inputsNoLongerUsed = new ArrayList(10);
+        ArrayList<BDD> newNewOutputs = new ArrayList();
         // Each one of f2's BDDs (outputs) may have an output feeding into f1
         assert(inputMapping.length == f2.getNumOutputs());
         int numNewOutputs = 0;
@@ -70,7 +76,7 @@ public class MultiBDD
                 int target = f2OutputTargets.get(k);
                 if (target == -1)
                 {
-                    newOutputs.add(f2Output);
+                    newNewOutputs.add(f2Output);
                     numNewOutputs++;
                 }
                 else
@@ -85,9 +91,13 @@ public class MultiBDD
         for (int i = 0; i < inputsNoLongerUsed.size(); i++)
         {
             f1NewOutput.tree.collapseInput(inputsNoLongerUsed.get(i) - i);
-            if (i < numNewOutputs)
-                newOutputs.get(newOutputs.size() - i - 1).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+            for (int j = 0; j < numNewOutputs; j++)
+                newNewOutputs.get(j).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+           // if (i < numNewOutputs)
+             //   newOutputs.get(newOutputs.size() - i - 1).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
         }
+        for (BDD b : newNewOutputs)
+            newOutputs.add(b);
         return f1NewOutput;
     }
     

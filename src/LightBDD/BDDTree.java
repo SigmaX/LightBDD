@@ -120,12 +120,15 @@ public class BDDTree
     public void postConcatonateInputs(int numInputsToAdd)
     {
         modifyNodeInputIndex(0, numInputsToAdd);
-        modifyNodeInputIndex(1, numInputsToAdd);
+        if (nodes.size() > 1) // In the case of an all-false-output function, the true node will not exist.
+            modifyNodeInputIndex(1, numInputsToAdd);
         this.numInputs += numInputsToAdd;
     }
     
     private void modifyNodeInputIndex(int nodeIndex, int difference)
     {
+        assert(nodeIndex < nodes.size());
+        assert(nodes.size() > 0);
         Node n = nodes.get(nodeIndex);
         nodesHash.remove(n);
         n.inputIndex += difference;
@@ -140,7 +143,8 @@ public class BDDTree
     {
         this.numInputs--;
         modifyNodeInputIndex(0, -1);
-        modifyNodeInputIndex(1, -1);
+        if (nodes.size() > 1) // In the case of an all-false-output function, the true node will not exist.
+            modifyNodeInputIndex(1, -1);
         for (int i = 2; i < nodes.size(); i++)
         {
             if (nodes.get(i).inputIndex > var)

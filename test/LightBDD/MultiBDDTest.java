@@ -81,6 +81,7 @@ public class MultiBDDTest
             assertEquals(outputNAND[i], result[1]);
         }
         
+        /*
         // TEST1
         MultiBDD n1 = new MultiBDD(BDD.Function.NAND);
         MultiBDD n2 = new MultiBDD(BDD.Function.NAND);
@@ -107,7 +108,30 @@ public class MultiBDDTest
         {
             boolean[] result = n123m.execute(input2.get(i));
             assertEquals(output.execute(input2.get(i))[0], result[0]);
-        }
+        }*/
+        
+        // XOR and MIMIC
+        MultiBDD xor = new MultiBDD(BDD.Function.XOR);
+        MultiBDD mim = new MultiBDD(BDD.Function.MIMIC);
+        inputMapping = new ArrayList[] {new ArrayList(2) };
+        inputMapping[0].add(1);
+        inputMapping[0].add(0);
+        MultiBDD xormim = new MultiBDD(xor, mim, inputMapping);
+        
+        // Another instance that caused trouble.  Take him out behind the barn and shoot 'im, I say.
+        MultiBDD doubleMimic = new MultiBDD(BDD.Function.MIMIC);
+        doubleMimic.bdds.add(new BDD(BDD.Function.MIMIC));
+        doubleMimic.bdds.get(0).postConcatonateInputs(1);
+        doubleMimic.bdds.get(1).postConcatonateInputs(1);
+        MultiBDD notNand = new MultiBDD(BDD.Function.NOT);
+        notNand.bdds.get(0).postConcatonateInputs(2);
+        notNand.bdds.add(new BDD(BDD.Function.NAND));
+        notNand.bdds.get(1).preConcatonateInputs(1);
+        inputMapping = new ArrayList[] { new ArrayList(1), new ArrayList(2) };
+        inputMapping[0].add(-1);
+        inputMapping[1].add(0);
+        inputMapping[1].add(1);
+        MultiBDD dmnnd = new MultiBDD(doubleMimic, notNand, inputMapping);
         
     }
 }
