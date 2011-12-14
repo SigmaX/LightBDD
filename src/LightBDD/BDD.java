@@ -16,10 +16,10 @@ import java.util.HashMap;
  * 
  * @author Eric 'Siggy' Scott
  */
-public class BDD
+public class BDD extends Executable
 {   
     /* If you add fields, don't forget to update the copy constructor! */
-    BDDTree tree;
+    private BDDTree tree;
     
     
     /**
@@ -41,7 +41,7 @@ public class BDD
         this.tree = (negation ? x.tree.BuildNegation() : new BDDTree(x.tree));
     }
     
-    public enum Function { TRUE, FALSE, NOT, NAND, OR, XOR, MIMIC, TEST1, TEST2, TEST3, TEST4, TEST5, XOR_POSTCAT2, XOR_PRECAT2 };
+    public enum Function { TRUE, FALSE, NOT, NAND, AND, OR, XOR, MIMIC, TEST1, TEST2, TEST3, TEST4, TEST5, XOR_POSTCAT2, XOR_PRECAT2 };
     /**
      *  Constructor for pre-defined functions
      */
@@ -68,6 +68,12 @@ public class BDD
                 this.tree = new BDDTree(2);
                 int highNodeNAND = tree.addNode(new Node(1, 0, 1));
                 tree.addNode(new Node(1, highNodeNAND, 0));
+                break;
+                
+            case AND:
+                this.tree = new BDDTree(2);
+                int highNodeAND = tree.addNode(new Node(0, 1, 1));
+                tree.addNode(new Node(0, highNodeAND, 0));
                 break;
                 
             case OR:
@@ -231,6 +237,18 @@ public class BDD
             this.tree.collapseInput(var);
     }
    
+    @Override
+    public int getNumInputs()
+    {
+        return this.tree.getNumInputs();
+    }
+    
+    @Override
+    public int getNumOutputs()
+    {
+        return 1;
+    }
+    
     public void preConcatonateInputs(int numInputsToAdd)
     {
         this.tree.preConcatonateInputs(numInputsToAdd);
@@ -241,10 +259,16 @@ public class BDD
         this.tree.postConcatonateInputs(numInputsToAdd);
     }
     
+    public void collapseInput(int var)
+    {
+        this.tree.collapseInput(var);
+    }
+    
     /**
      * Execute the boolean function represented by this BDD.
      */
-    public boolean execute(boolean[] input)
+    @Override
+    public boolean[] execute(boolean[] input)
     {
         assert(input.length == this.tree.getNumInputs());
         Node currentNode = tree.getNode(tree.getRootIndex());
@@ -253,7 +277,7 @@ public class BDD
             if (currentNode.inputIndex == i)
                 currentNode = (input[i] ? tree.getNode(currentNode.high) : tree.getNode(currentNode.low));
         }
-        return currentNode.terminalValue;
+        return new boolean[] { currentNode.terminalValue };
     }
     
     /**
