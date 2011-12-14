@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * 
  * @author Eric 'Siggy' Scott
  */
-public class MultiBDD
+public class MultiBDD extends Executable
 {
     public ArrayList<BDD> bdds;
     
@@ -40,6 +40,7 @@ public class MultiBDD
         // We have to modify each one of f1's BDDs to be our new outputs
         for (int i = 0; i < f1.getNumOutputs(); i++)
         {
+            newOutputs.clear();
             BDD f1NewOutput = compose(f1.bdds.get(i), f2, inputMapping, newOutputs);
             oldOutputs.add(f1NewOutput);
         }
@@ -47,11 +48,6 @@ public class MultiBDD
             this.bdds.add(b);
         for (BDD b : oldOutputs)
             this.bdds.add(b);
-        
-        for (int i = 1; i < this.getNumOutputs(); i++)
-        {
-            assert(this.bdds.get(i-1).tree.getNumInputs() == this.bdds.get(i).tree.getNumInputs());
-        }
     }
     
     /**
@@ -61,8 +57,8 @@ public class MultiBDD
     {
         BDD f1NewOutput = new BDD(f1Output); // Deep copy to avoid side effects
         f1NewOutput.preConcatonateInputs(f2.getNumInputs());
-        ArrayList<Integer> inputsNoLongerUsed = new ArrayList(10);
         ArrayList<BDD> newNewOutputs = new ArrayList();
+        ArrayList<Integer> inputsNoLongerUsed = new ArrayList(10);
         // Each one of f2's BDDs (outputs) may have an output feeding into f1
         assert(inputMapping.length == f2.getNumOutputs());
         int numNewOutputs = 0;
@@ -70,7 +66,7 @@ public class MultiBDD
         {
             ArrayList<Integer> f2OutputTargets = inputMapping[j];
             BDD f2Output = new BDD(f2.bdds.get(j));
-            f2Output.postConcatonateInputs(f1Output.tree.getNumInputs());
+            f2Output.postConcatonateInputs(f1Output.getNumInputs());
             for (int k = 0; k < f2OutputTargets.size(); k++)
             {
                 int target = f2OutputTargets.get(k);
@@ -90,9 +86,9 @@ public class MultiBDD
         // Remove the inputs that are no longer used
         for (int i = 0; i < inputsNoLongerUsed.size(); i++)
         {
-            f1NewOutput.tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+            f1NewOutput.collapseInput(inputsNoLongerUsed.get(i) - i);
             for (int j = 0; j < numNewOutputs; j++)
-                newNewOutputs.get(j).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+                newNewOutputs.get(j).collapseInput(inputsNoLongerUsed.get(i) - i);
            // if (i < numNewOutputs)
              //   newOutputs.get(newOutputs.size() - i - 1).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
         }
@@ -104,41 +100,28 @@ public class MultiBDD
     /**
      * Execute the boolean function represented by this MultiBDD. 
      */
+    @Override
     public boolean[] execute(boolean[] input)
     {
         assert(input.length == getNumInputs());
         boolean[] output = new boolean[bdds.size()];
         for (int i = 0; i < bdds.size(); i++)
-            output[i] = bdds.get(i).execute(input);
+            output[i] = bdds.get(i).execute(input)[0];
         return output;
     }
     
+    @Override
     public int getNumInputs()
     {
-        return bdds.get(0).tree.getNumInputs();
+        for (int i = 1; i < this.getNumOutputs(); i++)
+            assert(this.bdds.get(i-1).getNumInputs() == this.bdds.get(i).getNumInputs());
+        
+        return bdds.get(0).getNumInputs();
     }
     
+    @Override
     public int getNumOutputs()
     {
         return bdds.size();
-    }
-    
-    public String printTruthTable()
-    {
-        String output = "";
-        ArrayList<boolean[]> inputs = Util.generateInputs(this.getNumInputs());
-        for (boolean[] in : inputs)
-        {
-            for (boolean v : in)
-            {
-                output += (v ? "T " : "F ");
-            }
-            output += ":";
-            boolean[] outs = this.execute(in);
-            for (boolean out : outs)
-                output += "  " + (out ? "T  " : "F  ");
-            output += "\n";
-        }
-        return output;
     }
 }
