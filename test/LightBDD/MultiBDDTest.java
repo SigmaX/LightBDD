@@ -133,5 +133,14 @@ public class MultiBDDTest
         inputMapping[1].add(1);
         MultiBDD dmnnd = new MultiBDD(doubleMimic, notNand, inputMapping);
         
+        // And another.  This one had a wack number of outputs.
+        MultiBDD mimicNot = new MultiBDD(BDD.Function.MIMIC);
+        mimicNot.bdds.add(new BDD(BDD.Function.NOT));
+        mimicNot.bdds.get(0).preConcatonateInputs(1);
+        mimicNot.bdds.get(1).preConcatonateInputs(1);
+        MultiBDD and = new MultiBDD(BDD.Function.AND);
+        inputMapping = new ArrayList[] { new ArrayList(1) };
+        inputMapping[0].add(-1);
+        MultiBDD mna = new MultiBDD(mimicNot, and, inputMapping);
     }
 }
