@@ -64,6 +64,12 @@ public class BDDTest
         for (int i = 0; i < input2.size(); i++)
             assertEquals(output[i], instance.execute(input2.get(i)));
         
+        // AND
+        output = new boolean[] {true, false, false, false};
+        instance = new BDD(BDD.Function.AND);
+        for (int i = 0; i < input2.size(); i++)
+            assertEquals(output[i], instance.execute(input2.get(i)));
+        
         // OR
         output = new boolean[] {true, true, true, false};
         instance = new BDD(BDD.Function.OR);
