@@ -16,7 +16,7 @@ import java.util.HashMap;
  * 
  * @author Eric 'Siggy' Scott
  */
-public class BDD extends Executable
+public class BDD extends Executable implements Graph
 {   
     /* If you add fields, don't forget to update the copy constructor! */
     private BDDTree tree;
@@ -354,9 +354,10 @@ public class BDD extends Executable
             return tree.addNode(node);
     }
     
-    public String toDot(String name)
+    @Override
+    public String toDot()
     {
-        String dot = "digraph " + name + " {\n";
+        String dot = "digraph BDD {\n";
         dot += "True [shape=box];\nFalse [shape=box];\n";
         int r = tree.getRootIndex();
         boolean[] visited = new boolean[r+1];
