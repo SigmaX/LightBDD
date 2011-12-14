@@ -141,6 +141,7 @@ public class BDDTree
      */
     public void collapseInput(int var)
     {
+        // FIXME Should check to make sure there are no nodes for this input.
         this.numInputs--;
         modifyNodeInputIndex(0, -1);
         if (nodes.size() > 1) // In the case of an all-false-output function, the true node will not exist.
