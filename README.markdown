@@ -14,4 +14,4 @@ LightBDD's aim is to be easy to use for basic tasks, and has no pretense of comp
 * Multiple-output boolean function support (the MultiBDD class)
 
 [Anderson]: http://www.cs.unb.ca/~gdueck/courses/cs4835/bdd97.pdf "Henrik Reif Anderson, 'An Introduction to Binary Decision Diagrams,' 1997."
-[Bryan]: http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA470446&Location=U2&doc=GetTRDoc.pdf "Randall Bryant, 'Graph-Based Algorithms for Boolean Function Manipulation,' _IEEE Transactions on Computers_, August 1986.
+[Bryant]: http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA470446&Location=U2&doc=GetTRDoc.pdf "Randall Bryant, 'Graph-Based Algorithms for Boolean Function Manipulation,' _IEEE Transactions on Computers_, August 1986.
