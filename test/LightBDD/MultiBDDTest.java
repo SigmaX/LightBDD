@@ -65,6 +65,24 @@ public class MultiBDDTest
             assertEquals(outputXOR[i], result[0]);
             assertEquals(outputNAND[i], result[1]);
         }
+        // Test multi-execute function
+        boolean[][] output = {    {false, false},
+                                {false, true},
+                                {false, true},
+                                {false, true},
+                                {true, false},
+                                {true, true},
+                                {true, true},
+                                {true, true},
+                                {true, false },
+                                {true, true},
+                                {true, true},
+                                {true, true},
+                                {false, false},
+                                {false, true},
+                                {false, true},
+                                {false, true}};
+        assertArrayEquals(output, c.execute(input4));
         
         MultiBDD f3 = new MultiBDD(BDD.Function.MIMIC);
         inputMapping = new ArrayList[] { new ArrayList() };

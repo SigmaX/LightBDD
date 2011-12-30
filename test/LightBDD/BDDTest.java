@@ -19,6 +19,7 @@ public class BDDTest
         
     static final ArrayList<boolean[]> input2 = Util.generateInputs(2);
     static final ArrayList<boolean[]> input3 = Util.generateInputs(3);
+    static final ArrayList<boolean[]> input4 = Util.generateInputs(4);
     
     public BDDTest()
     {
@@ -43,8 +44,7 @@ public class BDDTest
     public void tearDown()
     {
     }
-   
-
+    
     /**
      * Test of execute method, of class BDD.
      */
@@ -55,44 +55,38 @@ public class BDDTest
         
         //NOT
         BDD instance = new BDD(BDD.Function.NOT);
-        assertEquals(true, instance.execute(new boolean[] {false}));
-        assertEquals(false, instance.execute(new boolean[] {true}));
+        Util.assertArrayEquals(new boolean[] {true}, instance.execute(new boolean[] {false}));
+        Util.assertArrayEquals(new boolean[] {false}, instance.execute(new boolean[] {true}));
         
         // NAND
-        boolean[] output = {false, true, true, true};
+        boolean[][] output = {{false}, {true}, {true}, {true}};
         instance = new BDD(BDD.Function.NAND);
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2));
         
         // AND
-        output = new boolean[] {true, false, false, false};
+        output = new boolean[][] {{true}, {false}, {false}, {false}};
         instance = new BDD(BDD.Function.AND);
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2)); 
         
         // OR
-        output = new boolean[] {true, true, true, false};
+        output = new boolean[][] {{true}, {true}, {true}, {false}};
         instance = new BDD(BDD.Function.OR);
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2)); 
         
         // XOR
-        output = new boolean[] {false, true, true, false};
+        output = new boolean[][] {{false}, {true}, {true}, {false}};
         instance = new BDD(BDD.Function.XOR);
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2)); 
         
         // TEST1 (!XOR)
-        output = new boolean[] {true, false, true, false};
+        output = new boolean[][] {{true}, {false}, {true}, {false}};
         instance = new BDD(BDD.Function.TEST1);
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2)); 
         
         //TEST3 (3 inputs)
-        output = new boolean[] {true, false, true, false, true, true, true, true};
+        output = new boolean[][] {{true}, {false}, {true}, {false}, {true}, {true}, {true}, {true}};
         instance = new BDD(BDD.Function.TEST3);
-        for (int i = 0; i < input3.size(); i++)
-            assertEquals(output[i], instance.execute(input3.get(i)));
+        assertArrayEquals(output, instance.execute(input3)); 
     }
     
     /**
@@ -108,42 +102,34 @@ public class BDDTest
         final BooleanOperator xor = new BooleanOperator() {@Override public boolean operate(boolean x, boolean y) { return (x^y); }};
         
         // NAND & XOR
-        boolean[] output = {false, true, true, false};
+        boolean[][] output = {{false}, {true}, {true}, {false}};
         BDD x = new BDD(BDD.Function.NAND);
         BDD y = new BDD(BDD.Function.XOR);
         BDD instance = new BDD(and, x, y);
-        for (int i = 0; i < input2.size(); i++)
-        {
-            assertEquals(output[i], instance.execute(input2.get(i)));
-            // Check for side effects
-            assertEquals((new BDD(BDD.Function.NAND)).execute(input2.get(i)), x.execute(input2.get(i)));
-            assertEquals((new BDD(BDD.Function.XOR)).execute(input2.get(i)), y.execute(input2.get(i)));
-        }
+        assertArrayEquals(output, instance.execute(input2));
+        // Check for side effects
+        assertArrayEquals((new BDD(BDD.Function.NAND)).execute(input2), x.execute(input2));
+        assertArrayEquals((new BDD(BDD.Function.XOR)).execute(input2), y.execute(input2));
         
         // NAND & OR
-        output = new boolean[] {false, true, true, false};
+        output = new boolean[][] {{false}, {true}, {true}, {false}};
         x = new BDD(BDD.Function.NAND);
         y = new BDD(BDD.Function.OR);
         instance = new BDD(and, x, y);
-        for (int i = 0; i < input2.size(); i++)
-        {
-            assertEquals(output[i], instance.execute(input2.get(i)));
-            // Check for side effects
-            assertEquals((new BDD(BDD.Function.NAND)).execute(input2.get(i)), x.execute(input2.get(i)));
-            assertEquals((new BDD(BDD.Function.OR)).execute(input2.get(i)), y.execute(input2.get(i)));
-        }
+        assertArrayEquals(output, instance.execute(input2));
+        // Check for side effects
+        assertArrayEquals((new BDD(BDD.Function.NAND)).execute(input2), x.execute(input2));
+        assertArrayEquals((new BDD(BDD.Function.OR)).execute(input2), y.execute(input2));
         
         // (NAND & XOR) | OR
-        output = new boolean[] {true, true, true, false};
+        output = new boolean[][] {{true}, {true}, {true}, {false}};
         instance = new BDD(or, new BDD(and, new BDD(BDD.Function.NAND), new BDD(BDD.Function.XOR)), new BDD(BDD.Function.OR));
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2));
         
         // (NAND & XOR) ^ OR
-        output = new boolean[] {true, false, false, false};
+        output = new boolean[][] {{true}, {false}, {false}, {false}};
         instance = new BDD(xor, new BDD(and, new BDD(BDD.Function.NAND), new BDD(BDD.Function.XOR)), new BDD(BDD.Function.OR));
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals(output[i], instance.execute(input2.get(i)));
+        assertArrayEquals(output, instance.execute(input2));
     }
     
     /**
@@ -158,12 +144,9 @@ public class BDDTest
         BDD x = new BDD(BDD.Function.TEST2);
         BDD instance = new BDD(x, 1, false);
         BDD output = new BDD(BDD.Function.TEST3);
-        for (int i = 0; i < input3.size(); i++)
-        {
-            assertEquals(output.execute(input3.get(i)), instance.execute(input3.get(i)));
-            // Check for side effects
-            assertEquals((new BDD(BDD.Function.TEST2)).execute(input3.get(i)), x.execute(input3.get(i)));
-        }
+        assertArrayEquals(output.execute(input3), instance.execute(input3));
+        // Check for side effects
+        assertArrayEquals((new BDD(BDD.Function.TEST2)).execute(input3), x.execute(input3));
     }
     
     /**
@@ -182,40 +165,27 @@ public class BDDTest
         BDD f1 = new BDD(BDD.Function.XOR);
         BDD f2 = new BDD(BDD.Function.XOR);
         BDD instance = new BDD(0, f1, f2);
-        boolean[] output = { true, false, false, true, false, true, true, false };
-        for (int i = 0; i < input3.size(); i++)
-            assertEquals(output[i], instance.execute(input3.get(i)));
+        boolean[][] output = { {true}, {false}, {false}, {true}, {false}, {true}, {true}, {false} };
+        assertArrayEquals(output, instance.execute(input3));
         // Check for side effects
-        for (int i = 0; i < input2.size(); i++)
-        {
-            BDD xor = new BDD(BDD.Function.XOR);
-            assertEquals(xor.execute(input2.get(i)), f1.execute(input2.get(i)));
-            assertEquals(xor.execute(input2.get(i)), f2.execute(input2.get(i)));
-        }
+        BDD xor = new BDD(BDD.Function.XOR);
+        assertArrayEquals(xor.execute(input2), f1.execute(input2));
+        assertArrayEquals(xor.execute(input2), f2.execute(input2));
         
         instance = new BDD(1, f1, f2);
-        for (int i = 0; i < input3.size(); i++)
-            assertEquals(output[i], instance.execute(input3.get(i)));
+        assertArrayEquals(output, instance.execute(input3));
         // Check for side effects
-        for (int i = 0; i < input2.size(); i++)
-        {
-            BDD xor = new BDD(BDD.Function.XOR);
-            assertEquals(xor.execute(input2.get(i)), f1.execute(input2.get(i)));
-            assertEquals(xor.execute(input2.get(i)), f2.execute(input2.get(i)));
-        }
+        assertArrayEquals(xor.execute(input2), f1.execute(input2));
+        assertArrayEquals(xor.execute(input2), f2.execute(input2));
         
-        ArrayList<boolean[]> input4 = Util.generateInputs(4);
         f1 = new BDD(BDD.Function.TEST3);
         f2 = new BDD(BDD.Function.XOR);
         instance = new BDD(0, f1, f2);
-        output = new boolean[] { true, true, true, true, true, false, true, false, true, false, true, false, true, true, true, true };
-        for (int i = 0; i < input4.size(); i++)
-            assertEquals(output[i], instance.execute(input4.get(i)));
+        output = new boolean[][] { {true}, {true}, {true}, {true}, {true}, {false}, {true}, {false}, {true}, {false}, {true}, {false}, {true}, {true}, {true}, {true} };
+        assertArrayEquals(output, instance.execute(input4));
         // Check for side effects
-        for (int i = 0; i < input3.size(); i++)
-            assertEquals((new BDD(BDD.Function.TEST3)).execute(input3.get(i)), f1.execute(input3.get(i)));
-        for (int i = 0; i < input2.size(); i++)
-            assertEquals((new BDD(BDD.Function.XOR)).execute(input2.get(i)), f2.execute(input2.get(i)));
+        assertArrayEquals((new BDD(BDD.Function.TEST3)).execute(input3), f1.execute(input3));
+        assertArrayEquals((new BDD(BDD.Function.XOR)).execute(input2), f2.execute(input2));
         
         // Make sure this sequence completes in a reasonable amount of time
         long time = System.currentTimeMillis();
@@ -234,17 +204,14 @@ public class BDDTest
         BDD f2 = new BDD(BDD.Function.XOR);
         f2.postConcatonateInputs(2);
         BDD f3 = new BDD(2, f1, f2, false);
-        boolean[] output = { true, false, true, false, false, true, false, true, false, true, false, true, true, false, true, false };
-        ArrayList<boolean[]> input4 = Util.generateInputs(4);
-        for (int i = 0; i < input4.size(); i++)
-            assertEquals(output[i], f3.execute(input4.get(i)));
+        boolean[][] output = { {true}, {false}, {true}, {false}, {false}, {true}, {false}, {true}, {false}, {true}, {false}, {true}, {true}, {false}, {true}, {false} };
+        assertArrayEquals(output, f3.execute(input4));
         
         BDD f4 = new BDD(BDD.Function.NAND);
         f4.postConcatonateInputs(2);
         BDD instance = new BDD(3, f3, f4, false);
-        output = new boolean[] { false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true };
-        for (int i = 0; i < input4.size(); i++)
-            assertEquals(output[i], instance.execute(input4.get(i)));
+        output = new boolean[][] { {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {true}, {true}, {true}, {true} };
+        assertArrayEquals(output, instance.execute(input4));
     }
     
     

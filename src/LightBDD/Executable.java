@@ -14,6 +14,21 @@ public abstract class Executable
     protected int numOutputs;
     
     public abstract boolean[] execute(boolean[] input); 
+    
+    /** Run execute(boolean[] input) on an array of inputs
+     * 
+     */
+    public boolean[][] execute(ArrayList<boolean[]> inputs)
+    {
+        boolean[][] outputs = new boolean[inputs.size()][inputs.get(0).length];
+        for (int i = 0; i < inputs.size(); i++)
+        {
+            boolean[] in = inputs.get(i);
+            assert(in.length == inputs.get(0).length); // Ragged input is invalid
+            outputs[i] = this.execute(in);
+        }
+        return outputs;
+    }
    
     public int getNumInputs()
     {

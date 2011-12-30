@@ -1,6 +1,7 @@
 package LightBDD;
 
 import java.util.ArrayList;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -32,4 +33,26 @@ public class Util
         }
     }
     
+    
+    /** Deep array comparison for booleans.
+     *  
+     *  JUnit doesn't have an assertArrayEquals for booleans.  So we
+     *  provide our own.
+     */
+    public static void assertArrayEquals(boolean[] a, boolean[] b)
+    {
+        assertTrue(a.length == b.length);
+        for (int i = 0; i < a.length; i++)
+            assertEquals(a[i], b[i]);
+    }
+    
+    /** Deep array comparison for two-dimensional booleans.
+     *  
+     */
+    /*public static void assertArrayEquals(boolean[][] a, boolean[][] b)
+    {
+        assertTrue(a.length == b.length);
+        for (int i = 0; i < a.length; i++)
+            assertArrayEquals(a[i], b[i]);
+    }*/
 }
