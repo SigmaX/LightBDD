@@ -136,6 +136,67 @@ public class BDDTree
     }
     
     /**
+     *  Test whether this is equal to the reference BDD.  Runs a DFS-based
+     *  rooted directed acyclic graph isomorphism algorithm, which
+     *  is linear in the number of nodes.
+     */
+    private int nextLabel;
+    private HashMap<Integer, Integer> visitedNodeLabels;
+    private HashMap<Integer, Integer> refVisitedNodeLabels;
+    public boolean equals(BDDTree referenceTree)
+    {
+        visitedNodeLabels = new HashMap();
+        refVisitedNodeLabels = new HashMap();
+        visitedNodeLabels.put(0, 0);
+        visitedNodeLabels.put(1, 1);
+        refVisitedNodeLabels.put(0, 0);
+        refVisitedNodeLabels.put(1, 1);
+        nextLabel = 2;
+        return equalsDFS(referenceTree, this.getRootIndex(), referenceTree.getRootIndex());
+    }
+    
+    private boolean equalsDFS(BDDTree referenceTree, int thisNodeIndex, int refNodeIndex)
+    {   
+        // Special case at terminals
+        if ((thisNodeIndex == 0 || thisNodeIndex == 1) && (refNodeIndex == 0 || refNodeIndex == 1))
+            return (this.getNode(thisNodeIndex).terminalValue == referenceTree.getNode(refNodeIndex).terminalValue);
+        // Isomorphic nodes are visited together, so if their visted status is mismatched, they are not isomorphic. 
+        if (visitedNodeLabels.containsKey(thisNodeIndex) != refVisitedNodeLabels.containsKey(refNodeIndex))
+            return false;
+        // If the local and refernce nodes have both been visited, are they isomorphic?
+        if (visitedNodeLabels.containsKey(thisNodeIndex))
+        {
+            if (visitedNodeLabels.get(thisNodeIndex) == refVisitedNodeLabels.get(refNodeIndex))
+                return true;
+            else
+                return false;
+        }
+              
+        
+        // If we haven't yet visited these nodes, see if the subgraphs are isomorphic.
+        Node thisNode = this.getNode(thisNodeIndex);
+        Node refNode = referenceTree.getNode(refNodeIndex);
+        
+        if (thisNode.inputIndex != refNode.inputIndex)
+            return false;
+        
+        boolean lowResult = equalsDFS(referenceTree, thisNode.low, refNode.low);
+        if (!lowResult)
+            return false;
+        
+        boolean highResult = equalsDFS(referenceTree, thisNode.high, refNode.high);
+        if (!highResult)
+            return false;
+        
+        // Both children are isomorphic, so the parent is too!
+        visitedNodeLabels.put(thisNodeIndex, nextLabel);
+        refVisitedNodeLabels.put(refNodeIndex, nextLabel);
+        nextLabel++;
+        return true;
+        
+    }
+    
+    /**
      * Obliterate an input variable.  Only use this if there are no nodes for
      * this variable, i.e. if the function doesn't depend on it!
      */
@@ -178,6 +239,9 @@ public class BDDTree
         }
     }
     
+    /**
+     *  Careful!  addNode(Node) makes assumptions about the indices. 
+     */
     private void addNode(Node n, int index)
     {
         nodes.add(index, n);

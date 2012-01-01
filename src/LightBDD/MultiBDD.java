@@ -97,6 +97,18 @@ public class MultiBDD extends Executable
         return f1NewOutput;
     }
     
+    public boolean equals(MultiBDD reference)
+    {
+        if (this.getNumOutputs() != reference.getNumOutputs())
+            return false;
+        for (int i = 0; i < this.getNumOutputs(); i++)
+        {
+            if (!this.bdds.get(i).equals(reference.bdds.get(i)))
+                return false;
+        }
+        return true;
+    }
+    
     /**
      * Execute the boolean function represented by this MultiBDD. 
      */

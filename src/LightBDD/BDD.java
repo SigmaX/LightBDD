@@ -197,7 +197,7 @@ public class BDD extends Executable implements Graph
      */
     public BDD(int var, BDD f1, BDD f2, boolean autoConcatonate)
     {
-        
+        assert(var < f1.getNumInputs());
         f1 = new BDD(f1);
         f2 = new BDD(f2);
         if (autoConcatonate)
@@ -260,6 +260,21 @@ public class BDD extends Executable implements Graph
     public int getNumOutputs()
     {
         return 1;
+    }
+    
+    public BDDTree getTree()
+    {
+        return this.tree;
+    }
+    
+    /**
+     *  Test whether this is equal to the reference BDD.  Runs a DFS-based
+     *  rooted directed acyclic graph isomorphism algorithm, which
+     *  is linear in the number of nodes.
+     */
+    public boolean equals(BDD reference)
+    {
+        return this.tree.equals(reference.getTree());
     }
     
     public void preConcatonateInputs(int numInputsToAdd)

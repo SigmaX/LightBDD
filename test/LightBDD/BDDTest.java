@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class BDDTest
 {
-        
+    static final ArrayList<boolean[]> input1 = Util.generateInputs(1);
     static final ArrayList<boolean[]> input2 = Util.generateInputs(2);
     static final ArrayList<boolean[]> input3 = Util.generateInputs(3);
     static final ArrayList<boolean[]> input4 = Util.generateInputs(4);
@@ -86,7 +86,7 @@ public class BDDTest
         //TEST3 (3 inputs)
         output = new boolean[][] {{true}, {false}, {true}, {false}, {true}, {true}, {true}, {true}};
         instance = new BDD(BDD.Function.TEST3);
-        assertArrayEquals(output, instance.execute(input3)); 
+        assertArrayEquals(output, instance.execute(input3));
     }
     
     /**
@@ -187,6 +187,11 @@ public class BDDTest
         assertArrayEquals((new BDD(BDD.Function.TEST3)).execute(input3), f1.execute(input3));
         assertArrayEquals((new BDD(BDD.Function.XOR)).execute(input2), f2.execute(input2));
         
+        f1 = new BDD(BDD.Function.XOR);
+        f2 = new BDD(BDD.Function.FALSE);
+        instance = new BDD(0, f1, f2);
+        assertArrayEquals(input1.toArray(), instance.execute(input1));
+        
         // Make sure this sequence completes in a reasonable amount of time
         long time = System.currentTimeMillis();
         instance = new BDD(0, instance, instance);
@@ -198,7 +203,6 @@ public class BDDTest
     
     private void testAdvancedComposition()
     {
-        
         BDD f1 = new BDD(BDD.Function.XOR);
         f1.preConcatonateInputs(2);
         BDD f2 = new BDD(BDD.Function.XOR);
@@ -213,6 +217,56 @@ public class BDDTest
         output = new boolean[][] { {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {false}, {true}, {true}, {true}, {true} };
         assertArrayEquals(output, instance.execute(input4));
     }
+    
+    @Test
+    public void testEquals()
+    {
+        System.out.println("equals");
+        
+        BDDTree xor = new BDDTree(2);
+        int lowNodeXOR = xor.addNode(new Node(0, 1, 1));
+        int highNodeXOR = xor.addNode(new Node(1, 0, 1));
+        xor.addNode(new Node(lowNodeXOR, highNodeXOR, 0));
+
+        BDDTree or = new BDDTree(2);
+        int lowNodeOR = or.addNode(new Node(0, 1, 1));
+        or.addNode(new Node(lowNodeOR, 1, 0));
+        
+        assertTrue(xor.equals(xor));
+        assertFalse(xor.equals(or));
+        
+        // Make sure varying node ids doesn't affect anything
+        BDDTree test4a = new BDDTree(5);
+        int n2 = test4a.addNode(new Node(1, 0, 4));
+        int n3 = test4a.addNode(new Node(n2, 0, 3));
+        int n4 = test4a.addNode(new Node(0, n2, 3));
+        int n5 = test4a.addNode(new Node(n3, n4, 2));
+        int n6 = test4a.addNode(new Node(n5, 0, 1));
+        int n7 = test4a.addNode(new Node(0, n5, 1));
+        test4a.addNode(new Node(n6, n7, 0));
+        assertFalse(test4a.equals(xor));
+        
+        BDDTree test4b = new BDDTree(5);
+        n2 = test4b.addNode(new Node(1, 0, 4));
+        n4 = test4b.addNode(new Node(0, n2, 3));
+        n3 = test4b.addNode(new Node(n2, 0, 3));
+        n5 = test4b.addNode(new Node(n3, n4, 2));
+        n7 = test4b.addNode(new Node(0, n5, 1));
+        n6 = test4b.addNode(new Node(n5, 0, 1));
+        test4b.addNode(new Node(n6, n7, 0));
+        assertFalse(test4b.equals(xor));
+        assertTrue(test4b.equals(test4a));
+        
+        BDD not = new BDD(BDD.Function.NOT);
+        BDD shunt = new BDD(BDD.Function.SHUNT);
+        assertFalse(not.equals(shunt));
+        assertFalse(shunt.equals(not));
+        
+        BDD f = new BDD(BDD.Function.FALSE);
+        assertFalse(f.equals(test4b));
+        BDD t = new BDD(BDD.Function.TRUE);
+        assertFalse(f.equals(t));
+    }       
     
     
 }
