@@ -41,7 +41,7 @@ public class BDD extends Executable implements Graph
         this.tree = (negation ? x.tree.BuildNegation() : new BDDTree(x.tree));
     }
     
-    public enum Function { TRUE, FALSE, NOT, NAND, AND, OR, XOR, MIMIC, TEST1, TEST2, TEST3, TEST4, TEST5, XOR_POSTCAT2, XOR_PRECAT2 };
+    public enum Function { TRUE, FALSE, NOT, NAND, AND, OR, XOR, SHUNT, TEST1, TEST2, TEST3, TEST4, TEST5, XOR_POSTCAT2, XOR_PRECAT2 };
     /**
      *  Constructor for pre-defined functions
      */
@@ -89,7 +89,7 @@ public class BDD extends Executable implements Graph
                 tree.addNode(new Node(lowNodeXOR, highNodeXOR, 0));
                 break;
                 
-            case MIMIC:
+            case SHUNT:
                 this.tree = new BDDTree(1);
                 tree.addNode(new Node(0, 1, 0));
                 break;
@@ -167,7 +167,7 @@ public class BDD extends Executable implements Graph
     public BDD(BDD x, int inputToFix, boolean value)
     {
         this.tree = new BDDTree(x.tree);
-        int newRoot = restrict(x.tree, x.tree.getRootIndex(), inputToFix, value);
+        int newRoot = restrict(x.tree, x.tree.getRootIndex(), inputToFix, value, new HashMap<Integer, Integer>());
         tree.setRootIndex(newRoot);
     }
     
@@ -197,7 +197,33 @@ public class BDD extends Executable implements Graph
      */
     public BDD(int var, BDD f1, BDD f2, boolean autoConcatonate)
     {
-        /* The algorithm uses the Shannon Expansion of boolean functions to
+        
+        f1 = new BDD(f1);
+        f2 = new BDD(f2);
+        if (autoConcatonate)
+        {
+            int oldF1NumInputs = f1.tree.getNumInputs();
+            f1.tree.preConcatonateInputs(f2.tree.getNumInputs());
+            var += f2.tree.getNumInputs(); // The varth input of f1 has moved
+            f2.tree.postConcatonateInputs(oldF1NumInputs);
+        }
+        
+        buildThisFromComposition(var, f1, f2);
+        
+        if (autoConcatonate)
+            this.tree.collapseInput(var);
+    }
+    
+    private void buildThisFromCompositionFast(int var, BDD f1, BDD f2)
+    {
+        // TODO The existing algorithm is O(m^2 n^2), where m and n are the
+        // number of nodes in f1 and f2, respectively.  An O(m^2 n) algorithm
+        // exists in Bryant.  It should be implemented here.
+    }
+    
+    private void buildThisFromComposition(int var, BDD f1, BDD f2)
+    {
+        /* This algorithm uses the Shannon Expansion of boolean functions to
          * express the composition in terms of apply() and restrict().  If
          * f|var1=0 represents f.restrict(1, false), then the composition
          * f1|var=f2 = (f2 & f1|var=1) | (!f2 & f1|var=0).
@@ -209,16 +235,6 @@ public class BDD extends Executable implements Graph
          * do composition, but it's easier to understand/implement int terms of
          * apply() and restrict().
          */
-        
-        f1 = new BDD(f1);
-        f2 = new BDD(f2);
-        if (autoConcatonate)
-        {
-            int oldF1NumInputs = f1.tree.getNumInputs();
-            f1.tree.preConcatonateInputs(f2.tree.getNumInputs());
-            var += f2.tree.getNumInputs(); // The varth input of f1 has moved
-            f2.tree.postConcatonateInputs(oldF1NumInputs);
-        }
         
         final BooleanOperator and = new BooleanOperator() {@Override public boolean operate(boolean x, boolean y) { return (x&y); }};
         final BooleanOperator or = new BooleanOperator() {@Override public boolean operate(boolean x, boolean y) { return (x|y); }};
@@ -232,9 +248,6 @@ public class BDD extends Executable implements Graph
         this.tree = new BDDTree(x.tree.getNumInputs());
         HashMap<Integer[], Integer> dynamicProgrammingMemory = new HashMap();
         apply(dynamicProgrammingMemory, or, x.tree, y.tree, x.tree.getRootIndex(), y.tree.getRootIndex());
-        
-        if (autoConcatonate)
-            this.tree.collapseInput(var);
     }
    
     @Override
@@ -321,23 +334,32 @@ public class BDD extends Executable implements Graph
         return output;
     }
     
+    
     /**
      * Build a new BDD by restricting one of the inputs of a pre-existing one.
      */
-    private int restrict(BDDTree xTree, int currentIndex, int inputToFix, boolean value)
+    private int restrict(BDDTree xTree, int currentIndex, int inputToFix, boolean value, HashMap<Integer, Integer> dpMemory)
     {
         /* We search for all nodes with Node.inputIndex = inputIndex and replace
          * them with their low- or high-child depending on the parity of value.
          * From Anderson (1997). */
+        if (dpMemory.containsKey(currentIndex))
+            return dpMemory.get(currentIndex);
+        
         Node u = xTree.getNode(currentIndex);
+        int returnValue = 0;
+        
         if (u.inputIndex > inputToFix)
-            return currentIndex;
+            returnValue = currentIndex;
         else if (u.inputIndex < inputToFix)
-            return mk(new Node(restrict(xTree, u.low, inputToFix, value), restrict(xTree, u.high, inputToFix, value), u.inputIndex));
+            returnValue = mk(new Node(restrict(xTree, u.low, inputToFix, value, dpMemory), restrict(xTree, u.high, inputToFix, value, dpMemory), u.inputIndex));
         else if (!value)
-            return restrict(xTree, u.low, inputToFix, value);
+            returnValue = restrict(xTree, u.low, inputToFix, value, dpMemory);
         else
-            return restrict(xTree, u.high, inputToFix, value);
+            returnValue = restrict(xTree, u.high, inputToFix, value, dpMemory);
+        
+        dpMemory.put(currentIndex, returnValue);
+        return returnValue;
     }
     
     /**

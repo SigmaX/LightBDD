@@ -84,7 +84,7 @@ public class MultiBDDTest
                                 {false, true}};
         assertArrayEquals(output, c.execute(input4));
         
-        MultiBDD f3 = new MultiBDD(BDD.Function.MIMIC);
+        MultiBDD f3 = new MultiBDD(BDD.Function.SHUNT);
         inputMapping = new ArrayList[] { new ArrayList() };
         inputMapping[0].add(0);
         inputMapping[0].add(2);
@@ -130,15 +130,15 @@ public class MultiBDDTest
         
         // XOR and MIMIC
         MultiBDD xor = new MultiBDD(BDD.Function.XOR);
-        MultiBDD mim = new MultiBDD(BDD.Function.MIMIC);
+        MultiBDD mim = new MultiBDD(BDD.Function.SHUNT);
         inputMapping = new ArrayList[] {new ArrayList(2) };
         inputMapping[0].add(1);
         inputMapping[0].add(0);
         MultiBDD xormim = new MultiBDD(xor, mim, inputMapping);
         
         // Another instance that caused trouble.  Take him out behind the barn and shoot 'im, I say.
-        MultiBDD doubleMimic = new MultiBDD(BDD.Function.MIMIC);
-        doubleMimic.bdds.add(new BDD(BDD.Function.MIMIC));
+        MultiBDD doubleMimic = new MultiBDD(BDD.Function.SHUNT);
+        doubleMimic.bdds.add(new BDD(BDD.Function.SHUNT));
         doubleMimic.bdds.get(0).postConcatonateInputs(1);
         doubleMimic.bdds.get(1).postConcatonateInputs(1);
         MultiBDD notNand = new MultiBDD(BDD.Function.NOT);
@@ -152,7 +152,7 @@ public class MultiBDDTest
         MultiBDD dmnnd = new MultiBDD(doubleMimic, notNand, inputMapping);
         
         // And another.  This one had a wack number of outputs.
-        MultiBDD mimicNot = new MultiBDD(BDD.Function.MIMIC);
+        MultiBDD mimicNot = new MultiBDD(BDD.Function.SHUNT);
         mimicNot.bdds.add(new BDD(BDD.Function.NOT));
         mimicNot.bdds.get(0).preConcatonateInputs(1);
         mimicNot.bdds.get(1).preConcatonateInputs(1);
