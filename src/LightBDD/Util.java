@@ -1,6 +1,7 @@
 package LightBDD;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import static org.junit.Assert.*;
 
 /**
@@ -9,12 +10,18 @@ import static org.junit.Assert.*;
  */
 public class Util
 {
+    private static HashMap<Integer, ArrayList<boolean[]>> inputCombinations = new HashMap();
+    
     public static ArrayList<boolean[]> generateInputs(int numInputs)
     {
+        if (inputCombinations.containsKey(numInputs))
+            return inputCombinations.get(numInputs);
+        
         ArrayList<boolean[]> output = new ArrayList((int)Math.pow(numInputs, 2));
         boolean[] b = new boolean[numInputs];
 
         generateInputs(numInputs, b, output, 0);
+        inputCombinations.put(numInputs, output);
         return output;
     }
     
