@@ -10,8 +10,6 @@ import java.util.ArrayList;
  */
 public abstract class Executable
 {
-    protected int numInputs;
-    protected int numOutputs;
     
     public abstract boolean[] execute(boolean[] input); 
     
@@ -30,15 +28,9 @@ public abstract class Executable
         return outputs;
     }
    
-    public int getNumInputs()
-    {
-        return numInputs;
-    }
+    public abstract int getNumInputs();
     
-    public int getNumOutputs()
-    {
-        return numOutputs;
-    }
+    public abstract int getNumOutputs();
     
     public String printTruthTable()
     {
