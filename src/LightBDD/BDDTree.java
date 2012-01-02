@@ -224,6 +224,11 @@ public class BDDTree
         return nodesHash.get(n);
     }
     
+    public Node getRootNode()
+    {
+        return nodes.get(getRootIndex());
+    }
+    
     public int getRootIndex()
     {
         return nodes.size() - 1;

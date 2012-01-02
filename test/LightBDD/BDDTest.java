@@ -187,10 +187,21 @@ public class BDDTest
         assertArrayEquals((new BDD(BDD.Function.TEST3)).execute(input3), f1.execute(input3));
         assertArrayEquals((new BDD(BDD.Function.XOR)).execute(input2), f2.execute(input2));
         
+        // Composition with constants
         f1 = new BDD(BDD.Function.XOR);
         f2 = new BDD(BDD.Function.FALSE);
         instance = new BDD(0, f1, f2);
         assertArrayEquals(input1.toArray(), instance.execute(input1));
+        
+        output = new boolean[][] {{true}, {false}, {true}, {false}};
+        f1 = new BDD(BDD.Function.TEST3);
+        f2 = new BDD(BDD.Function.TRUE);
+        instance = new BDD(0, f1, f2);
+        assertArrayEquals(output, instance.execute(input2));
+        
+        output = new boolean[][] {{true}, {false}, {true}, {true}};
+        instance = new BDD(1, f1, f2);
+        assertArrayEquals(output, instance.execute(input2));
         
         // Make sure this sequence completes in a reasonable amount of time
         long time = System.currentTimeMillis();

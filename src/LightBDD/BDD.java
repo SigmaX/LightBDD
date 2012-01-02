@@ -223,6 +223,7 @@ public class BDD extends Executable implements Graph
     
     private void buildThisFromComposition(int var, BDD f1, BDD f2)
     {
+        
         /* This algorithm uses the Shannon Expansion of boolean functions to
          * express the composition in terms of apply() and restrict().  If
          * f|var1=0 represents f.restrict(1, false), then the composition
@@ -235,6 +236,14 @@ public class BDD extends Executable implements Graph
          * do composition, but it's easier to understand/implement int terms of
          * apply() and restrict().
          */
+        
+        // Special case: If f2 is a constant, just restrict.
+        if (f2.isConstant())
+        {
+            BDD f1_restricted = new BDD(f1, var, f2.tree.getRootNode().terminalValue);
+            this.tree = new BDDTree(f1_restricted.tree);
+            return;
+        }           
         
         final BooleanOperator and = new BooleanOperator() {@Override public boolean operate(boolean x, boolean y) { return (x&y); }};
         final BooleanOperator or = new BooleanOperator() {@Override public boolean operate(boolean x, boolean y) { return (x|y); }};
@@ -275,6 +284,11 @@ public class BDD extends Executable implements Graph
     public boolean equals(BDD reference)
     {
         return this.tree.equals(reference.getTree());
+    }
+    
+    public boolean isConstant()
+    {
+        return (this.tree.getRootNode().isTerminal());
     }
     
     public void preConcatonateInputs(int numInputsToAdd)
