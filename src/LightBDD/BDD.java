@@ -21,6 +21,13 @@ public class BDD extends Executable implements Graph
     /* If you add fields, don't forget to update the copy constructor! */
     private BDDTree tree;
     
+    /**
+     *  Manual constructor
+     */
+    public BDD(BDDTree tree)
+    {
+        this.tree = tree;
+    }
     
     /**
      * Deep copy constructor
