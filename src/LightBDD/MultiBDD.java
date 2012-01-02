@@ -1,6 +1,8 @@
 package LightBDD;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * BDD objects are multi-input, single-output.  MultiBDDs use multiple BDD's to
@@ -11,6 +13,14 @@ import java.util.ArrayList;
 public class MultiBDD extends Executable
 {
     public ArrayList<BDD> bdds;
+    
+    /**
+     * Manual constructor
+     */
+    public MultiBDD(ArrayList<BDD> bdds)
+    {
+        this.bdds = bdds;
+    }
     
     /**
      * Initializes a one-output function (i.e., one BDD).  
@@ -84,13 +94,12 @@ public class MultiBDD extends Executable
             }
         } // f1Output has now received all the inputs it will from f2
         // Remove the inputs that are no longer used
+        Collections.sort(inputsNoLongerUsed, Collections.reverseOrder());
         for (int i = 0; i < inputsNoLongerUsed.size(); i++)
         {
-            f1NewOutput.collapseInput(inputsNoLongerUsed.get(i) - i);
+            f1NewOutput.collapseInput(inputsNoLongerUsed.get(i));
             for (int j = 0; j < numNewOutputs; j++)
-                newNewOutputs.get(j).collapseInput(inputsNoLongerUsed.get(i) - i);
-           // if (i < numNewOutputs)
-             //   newOutputs.get(newOutputs.size() - i - 1).tree.collapseInput(inputsNoLongerUsed.get(i) - i);
+                newNewOutputs.get(j).collapseInput(inputsNoLongerUsed.get(i));
         }
         for (BDD b : newNewOutputs)
             newOutputs.add(b);

@@ -104,7 +104,7 @@ public class MultiBDDTest
         MultiBDD n1 = new MultiBDD(BDD.Function.NAND);
         MultiBDD n2 = new MultiBDD(BDD.Function.NAND);
         MultiBDD n3 = new MultiBDD(BDD.Function.NAND);
-        MultiBDD mimic = new MultiBDD(BDD.Function.MIMIC);
+        MultiBDD mimic = new MultiBDD(BDD.Function.SHUNT);
         inputMapping = new ArrayList[] { new ArrayList(2) };
         inputMapping[0].add(0);
         inputMapping[0].add(-1);
@@ -114,18 +114,18 @@ public class MultiBDDTest
         inputMapping[0].add(2);
         // FIXME This operation causes an unintend input variable reordering (swaps 0 and 1).
         MultiBDD n12m = new MultiBDD(n12, mimic, inputMapping);
-        System.out.println(n12m.bdds.get(0).toDot("A"));
-        System.out.println(n12m.bdds.get(1).toDot("B"));
+        //System.out.println(n12m.bdds.get(0).toDot());
+        //System.out.println(n12m.bdds.get(1).toDot());
         inputMapping = new ArrayList[] { new ArrayList(1), new ArrayList(1) };
         inputMapping[0].add(0);
         inputMapping[1].add(1);
         MultiBDD n123m = new MultiBDD(n3, n12m, inputMapping);
-        MultiBDD output = new MultiBDD(BDD.Function.TEST1);
+        MultiBDD outputmbdd = new MultiBDD(BDD.Function.TEST1);
         ArrayList<boolean[]> input2 = Util.generateInputs(2);
         for (int i = 0; i < input2.size(); i++)
         {
             boolean[] result = n123m.execute(input2.get(i));
-            assertEquals(output.execute(input2.get(i))[0], result[0]);
+            assertEquals(outputmbdd.execute(input2.get(i))[0], result[0]);
         }*/
         
         // XOR and MIMIC
@@ -160,5 +160,43 @@ public class MultiBDDTest
         inputMapping = new ArrayList[] { new ArrayList(1) };
         inputMapping[0].add(-1);
         MultiBDD mna = new MultiBDD(mimicNot, and, inputMapping);
+        
+        // Yet another trouble-maker.  Yay for boundary conditions O_o
+        BDDTree m0Tree = new BDDTree(3);
+        m0Tree.addNode(new Node(0, 1, 0));
+        BDDTree m1Tree = new BDDTree(3);
+        int m1_1 = m1Tree.addNode(new Node(1, 0, 2));
+        m1Tree.addNode(new Node(1, m1_1, 1));
+        ArrayList<BDD> maleBDDs = new ArrayList(2);
+        maleBDDs.add(new BDD(m0Tree));
+        maleBDDs.add(new BDD(m1Tree));
+        MultiBDD male = new MultiBDD(maleBDDs);
+        
+        BDDTree fTree = new BDDTree(3);
+        int f_2 = fTree.addNode(new Node(1, 0, 2));
+        int f_3 = fTree.addNode(new Node(0, 1, 2));
+        fTree.addNode(new Node(f_2, f_3, 0));
+        ArrayList<BDD> femaleBDDs = new ArrayList(1);
+        femaleBDDs.add(new BDD(fTree));
+        MultiBDD female = new MultiBDD(femaleBDDs);
+        
+        BDDTree rTree = new BDDTree(3);
+        int r_2 = rTree.addNode(new Node(0, 1, 2));
+        int r_3 = rTree.addNode(new Node(0, r_2, 1));
+        int r_4 = rTree.addNode(new Node(1, 0, 2));
+        int r_5 = rTree.addNode(new Node(1, r_4, 1));
+        rTree.addNode(new Node(r_3, r_5, 0));
+        ArrayList<BDD> resultBDDs = new ArrayList(1);
+        resultBDDs.add(new BDD(rTree));
+        MultiBDD expectedResult = new MultiBDD(resultBDDs);
+        
+        inputMapping = new ArrayList[] { new ArrayList<Integer>(), new ArrayList<Integer>() };
+        inputMapping[0].add(1);
+        inputMapping[0].add(2);
+        inputMapping[1].add(0);
+        
+        MultiBDD result = new MultiBDD(female, male, inputMapping);
+        assertArrayEquals(expectedResult.execute(input3), result.execute(input3)); // Truth tables match
+        assertTrue(result.equals(expectedResult)); // BDDs are isomorphic
     }
 }
