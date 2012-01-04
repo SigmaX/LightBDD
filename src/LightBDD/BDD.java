@@ -323,9 +323,20 @@ public class BDD extends Executable implements Graph
      *  rooted directed acyclic graph isomorphism algorithm, which
      *  is linear in the number of nodes.
      */
-    public boolean equals(BDD reference)
+    @Override
+    public boolean equals(Object reference)
     {
-        return this.tree.equals(reference.getTree());
+        if (! (reference instanceof BDD))
+            return false;
+        return this.tree.equals(((BDD)reference).getTree());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        hash = 47 * hash + (this.tree != null ? this.tree.hashCode() : 0);
+        return hash;
     }
     
     public boolean isConstant()

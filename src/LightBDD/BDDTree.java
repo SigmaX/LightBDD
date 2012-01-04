@@ -143,8 +143,11 @@ public class BDDTree
     private int nextLabel;
     private HashMap<Integer, Integer> visitedNodeLabels;
     private HashMap<Integer, Integer> refVisitedNodeLabels;
-    public boolean equals(BDDTree referenceTree)
+    @Override
+    public boolean equals(Object referenceTree)
     {
+        if (! (referenceTree instanceof BDDTree))
+            return false;
         visitedNodeLabels = new HashMap();
         refVisitedNodeLabels = new HashMap();
         visitedNodeLabels.put(0, 0);
@@ -152,7 +155,16 @@ public class BDDTree
         refVisitedNodeLabels.put(0, 0);
         refVisitedNodeLabels.put(1, 1);
         nextLabel = 2;
-        return equalsDFS(referenceTree, this.getRootIndex(), referenceTree.getRootIndex());
+        return equalsDFS((BDDTree)referenceTree, this.getRootIndex(), ((BDDTree)referenceTree).getRootIndex());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 67 * hash + (this.nodes != null ? this.nodes.hashCode() : 0);
+        hash = 67 * hash + this.numInputs;
+        return hash;
     }
     
     private boolean equalsDFS(BDDTree referenceTree, int thisNodeIndex, int refNodeIndex)
