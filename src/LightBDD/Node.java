@@ -50,6 +50,8 @@ public class Node
     @Override
     public boolean equals(Object n)
     {
+        if (! (n instanceof Node))
+            return false;
         return (    (this.low == ((Node)n).low)
                 &&  (this.high == ((Node)n).high)
                 &&  (this.inputIndex == ((Node)n).inputIndex)
