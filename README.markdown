@@ -9,7 +9,7 @@ BDDs are used extensively in logic circuit design software and select computer s
 
 LightBDD's aim is to be easy to use for basic tasks, and has no pretense of competing with industrial-strength BDD libraries in terms of efficiency or completeness.  It has the following capabilities:
 
-* Build BDD a from a boolean function
+* Build a BDD from a boolean function
 * Apply, Restrict, and Compose operations (See [Bryant, 1986][Bryant])
 * Automatic generation of `dot` code for graph visualization by [Graphiz](http://www.graphviz.org/)
 * Multiple-output boolean function support (the MultiBDD class)
