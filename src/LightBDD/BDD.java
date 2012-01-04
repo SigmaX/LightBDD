@@ -48,6 +48,41 @@ public class BDD extends Executable implements Graph
         this.tree = (negation ? x.tree.BuildNegation() : new BDDTree(x.tree));
     }
     
+    /**
+     * Builds a BDD out of the specified boolean function.
+     * 
+     * Based on Anderson (1997).
+     * 
+     * @param f Function to clone
+     * @param output The function may be multi-output, but a BDD has only one output.  This selects one. 
+     */
+    public BDD(BooleanFunction f, int output)
+    {
+        this.tree = new BDDTree(f.getNumInputs());
+        buildThisFromBooleanFunction(f, output, new boolean[f.getNumInputs()], 0);
+    }
+    
+    public BDD(BooleanFunction f)
+    {
+        assert(f.getNumOutputs() == 1);
+        this.tree = new BDDTree(f.getNumInputs());
+        buildThisFromBooleanFunction(f, 0, new boolean[f.getNumInputs()], 0);
+    }
+    
+    private int buildThisFromBooleanFunction(BooleanFunction f, int output, boolean[] inputString, int inputIndex)
+    {
+        if (inputIndex == f.getNumInputs())
+            return (f.execute(inputString)[output] ? 1 : 0);
+        else
+        {
+            inputString[inputIndex] = false;
+            int lowChild = buildThisFromBooleanFunction(f, output, inputString, inputIndex + 1);
+            inputString[inputIndex] = true;
+            int highChild = buildThisFromBooleanFunction(f, output, inputString, inputIndex + 1);
+            return mk(new Node(lowChild, highChild, inputIndex));
+        }
+    }
+    
     public enum Function { TRUE, FALSE, NOT, NAND, AND, OR, XOR, SHUNT, TEST1, TEST2, TEST3, TEST4, TEST5, XOR_POSTCAT2, XOR_PRECAT2 };
     /**
      *  Constructor for pre-defined functions

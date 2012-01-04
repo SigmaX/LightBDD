@@ -2,7 +2,6 @@ package LightBDD;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * BDD objects are multi-input, single-output.  MultiBDDs use multiple BDD's to
@@ -42,7 +41,7 @@ public class MultiBDD extends Executable
      *          inputs of f1 that will receive their signal from the ith output of f2.  If -1 appears in
      *          the list, the ith output of f2 also becomes a new output of the composition.
      */
-    public MultiBDD(MultiBDD f1, MultiBDD f2, ArrayList<Integer>[] inputMapping)
+    public MultiBDD(MultiBDD f1, MultiBDD f2, CompositionMapping inputMapping)
     {
         bdds = new ArrayList<BDD>(10);
         ArrayList<BDD> newOutputs = new ArrayList(5);
@@ -61,20 +60,30 @@ public class MultiBDD extends Executable
     }
     
     /**
+     * Builds a MultiBDD out of the specified boolean function.
+     */
+    public MultiBDD(BooleanFunction f)
+    {
+        bdds = new ArrayList<BDD>(f.getNumOutputs());
+        for (int i = 0; i < f.getNumOutputs(); i++)
+            bdds.add(new BDD(f, i));
+    }
+    
+    /**
      * Create one output of a composed function and add it to bdds.
      */
-    private BDD compose(BDD f1Output, MultiBDD f2, ArrayList<Integer>[] inputMapping, ArrayList<BDD> newOutputs)
+    private BDD compose(BDD f1Output, MultiBDD f2, CompositionMapping inputMapping, ArrayList<BDD> newOutputs)
     {
         BDD f1NewOutput = new BDD(f1Output); // Deep copy to avoid side effects
         f1NewOutput.preConcatonateInputs(f2.getNumInputs());
         ArrayList<BDD> newNewOutputs = new ArrayList();
         ArrayList<Integer> inputsNoLongerUsed = new ArrayList(10);
         // Each one of f2's BDDs (outputs) may have an output feeding into f1
-        assert(inputMapping.length == f2.getNumOutputs());
+        assert(inputMapping.getMaleNumOutputs() == f2.getNumOutputs());
         int numNewOutputs = 0;
-        for (int j = 0; j < inputMapping.length; j++)
+        for (int j = 0; j < inputMapping.getMaleNumOutputs(); j++)
         {
-            ArrayList<Integer> f2OutputTargets = inputMapping[j];
+            ArrayList<Integer> f2OutputTargets = inputMapping.getOutputTargets(j);
             BDD f2Output = new BDD(f2.bdds.get(j));
             f2Output.postConcatonateInputs(f1Output.getNumInputs());
             for (int k = 0; k < f2OutputTargets.size(); k++)

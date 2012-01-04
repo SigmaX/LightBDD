@@ -20,6 +20,7 @@ public class BDDTest
     static final ArrayList<boolean[]> input2 = Util.generateInputs(2);
     static final ArrayList<boolean[]> input3 = Util.generateInputs(3);
     static final ArrayList<boolean[]> input4 = Util.generateInputs(4);
+    static final ArrayList<boolean[]> input10 = Util.generateInputs(10);
     
     public BDDTest()
     {
@@ -43,6 +44,37 @@ public class BDDTest
     @After
     public void tearDown()
     {
+    }
+    
+    /**
+     * Test construction from BooleanFunction
+     */
+    @Test
+    public void testConstructorFromBooleanFunction()
+    {
+        System.out.println("constructorFromBooleanFunction");
+        
+        BooleanFunction xor = new BooleanFunction("XOR", 2, 1) {
+            @Override public boolean[] execute(boolean[] inputs)
+            {
+                return new boolean[] { inputs[0]^inputs[1]};
+            }
+        };
+        BDD xorBDD = new BDD(xor);
+        assertArrayEquals(xor.execute(input2), xorBDD.execute(input2));
+        
+        int numInputs = 10;
+        BooleanFunction equal = new BooleanFunction(numInputs/2 + "_EQUAL", numInputs, 1) {
+            @Override public boolean[] execute(boolean[] inputs)
+            {
+                for (int i = 0; i < this.getNumInputs()/2; i++)
+                    if (inputs[i] != inputs[this.getNumInputs()/2 + i])
+                        return new boolean[] { false };
+                return new boolean[] { true };
+            }
+        };
+        BDD equalBDD = new BDD(equal);
+        assertArrayEquals(equal.execute(input10), equalBDD.execute(input10));
     }
     
     /**
