@@ -53,8 +53,8 @@ public class MultiBDDTest
         System.out.println("compose");
         MultiBDD f1 = new MultiBDD(BDD.Function.NAND);
         MultiBDD f2 = new MultiBDD(BDD.Function.XOR);
-        CompositionMapping inputMapping = new CompositionMapping(1);
-        inputMapping.getOutputTargets(0).add(-1);
+        CompositionMap inputMapping = new CompositionMap(1);
+        inputMapping.getMaleOutputTargets(0).add(-1);
         MultiBDD c = new MultiBDD(f1, f2, inputMapping);
         ArrayList<boolean[]> input4 = Util.generateInputs(4);
         boolean[] outputXOR = {false, false, false, false, true, true, true, true, true, true, true, true, false, false, false, false };
@@ -85,9 +85,9 @@ public class MultiBDDTest
         assertArrayEquals(output, c.execute(input4));
         
         MultiBDD f3 = new MultiBDD(BDD.Function.SHUNT);
-        inputMapping = new CompositionMapping(1);
-        inputMapping.getOutputTargets(0).add(0);
-        inputMapping.getOutputTargets(0).add(2);
+        inputMapping = new CompositionMap(1);
+        inputMapping.getMaleOutputTargets(0).add(0);
+        inputMapping.getMaleOutputTargets(0).add(2);
         c = new MultiBDD(c, f3, inputMapping);
         ArrayList<boolean[]> input3 = Util.generateInputs(3);
         outputXOR = new boolean[] { false, false, true, true, true, true, false, false };
@@ -131,9 +131,9 @@ public class MultiBDDTest
         // XOR and MIMIC
         MultiBDD xor = new MultiBDD(BDD.Function.XOR);
         MultiBDD mim = new MultiBDD(BDD.Function.SHUNT);
-        inputMapping = new CompositionMapping(1);
-        inputMapping.getOutputTargets(0).add(1);
-        inputMapping.getOutputTargets(0).add(0);
+        inputMapping = new CompositionMap(1);
+        inputMapping.getMaleOutputTargets(0).add(1);
+        inputMapping.getMaleOutputTargets(0).add(0);
         MultiBDD xormim = new MultiBDD(xor, mim, inputMapping);
         
         // Another instance that caused trouble.  Take him out behind the barn and shoot 'im, I say.
@@ -145,10 +145,10 @@ public class MultiBDDTest
         notNand.bdds.get(0).postConcatonateInputs(2);
         notNand.bdds.add(new BDD(BDD.Function.NAND));
         notNand.bdds.get(1).preConcatonateInputs(1);
-        inputMapping = new CompositionMapping(2);
-        inputMapping.getOutputTargets(0).add(-1);
-        inputMapping.getOutputTargets(1).add(0);
-        inputMapping.getOutputTargets(1).add(1);
+        inputMapping = new CompositionMap(2);
+        inputMapping.getMaleOutputTargets(0).add(-1);
+        inputMapping.getMaleOutputTargets(1).add(0);
+        inputMapping.getMaleOutputTargets(1).add(1);
         MultiBDD dmnnd = new MultiBDD(doubleMimic, notNand, inputMapping);
         
         // And another.  This one had a wack number of outputs.
@@ -157,8 +157,8 @@ public class MultiBDDTest
         mimicNot.bdds.get(0).preConcatonateInputs(1);
         mimicNot.bdds.get(1).preConcatonateInputs(1);
         MultiBDD and = new MultiBDD(BDD.Function.AND);
-        inputMapping = new CompositionMapping(1);
-        inputMapping.getOutputTargets(1).add(-1);
+        inputMapping = new CompositionMap(1);
+        inputMapping.getMaleOutputTargets(1).add(-1);
         MultiBDD mna = new MultiBDD(mimicNot, and, inputMapping);
         
         // Yet another trouble-maker.  Yay for boundary conditions O_o
@@ -190,10 +190,10 @@ public class MultiBDDTest
         resultBDDs.add(new BDD(rTree));
         MultiBDD expectedResult = new MultiBDD(resultBDDs);
         
-        inputMapping = new CompositionMapping(2);
-        inputMapping.getOutputTargets(0).add(1);
-        inputMapping.getOutputTargets(0).add(2);
-        inputMapping.getOutputTargets(1).add(0);
+        inputMapping = new CompositionMap(2);
+        inputMapping.getMaleOutputTargets(0).add(1);
+        inputMapping.getMaleOutputTargets(0).add(2);
+        inputMapping.getMaleOutputTargets(1).add(0);
         
         MultiBDD result = new MultiBDD(female, male, inputMapping);
         assertArrayEquals(expectedResult.execute(input3), result.execute(input3)); // Truth tables match

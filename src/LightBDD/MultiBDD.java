@@ -41,7 +41,7 @@ public class MultiBDD extends Executable
      *          inputs of f1 that will receive their signal from the ith output of f2.  If -1 appears in
      *          the list, the ith output of f2 also becomes a new output of the composition.
      */
-    public MultiBDD(MultiBDD f1, MultiBDD f2, CompositionMapping inputMapping)
+    public MultiBDD(MultiBDD f1, MultiBDD f2, CompositionMap inputMapping)
     {
         bdds = new ArrayList<BDD>(10);
         ArrayList<BDD> newOutputs = new ArrayList(5);
@@ -72,7 +72,7 @@ public class MultiBDD extends Executable
     /**
      * Create one output of a composed function and add it to bdds.
      */
-    private BDD compose(BDD f1Output, MultiBDD f2, CompositionMapping inputMapping, ArrayList<BDD> newOutputs)
+    private BDD compose(BDD f1Output, MultiBDD f2, CompositionMap inputMapping, ArrayList<BDD> newOutputs)
     {
         BDD f1NewOutput = new BDD(f1Output); // Deep copy to avoid side effects
         f1NewOutput.preConcatonateInputs(f2.getNumInputs());
@@ -83,7 +83,7 @@ public class MultiBDD extends Executable
         int numNewOutputs = 0;
         for (int j = 0; j < inputMapping.getMaleNumOutputs(); j++)
         {
-            ArrayList<Integer> f2OutputTargets = inputMapping.getOutputTargets(j);
+            ArrayList<Integer> f2OutputTargets = inputMapping.getMaleOutputTargets(j);
             BDD f2Output = new BDD(f2.bdds.get(j));
             f2Output.postConcatonateInputs(f1Output.getNumInputs());
             for (int k = 0; k < f2OutputTargets.size(); k++)
