@@ -5,12 +5,19 @@
 package LightBDD;
 
 /**
- * Graph objects can return dot code, which can be used by Graphiz to generate
+ * Graph objects can return dot code, which can be used by Graphviz to generate
  * images of them.
  * 
  * @author Eric 'Siggy' Scott
  */
 public interface Graph
 {
-    public String toDot();
+    /**
+     * Generate a dot graph from this object.
+     */
+    public String toDot(String name);
+    /**
+     * Generate a dot cluster from this object.
+     */
+    public String toSubDot(String id);
 }

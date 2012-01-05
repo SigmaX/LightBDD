@@ -459,22 +459,36 @@ public class BDD extends Executable implements Graph
     }
     
     @Override
-    public String toDot()
+    public String toDot(String name)
     {
-        String dot = "digraph BDD {\n";
-        dot += "True [shape=box];\nFalse [shape=box];\n";
-        int r = tree.getRootIndex();
-        boolean[] visited = new boolean[r+1];
-        for (int i = 0; i < r+1; i++)
-            visited[i] = false;
-        dot += toDotDFS(r, tree.getNode(r), null, false, visited);
+        String dot = "digraph " + name + " {\n";
+        dot += dotBody("");
         dot += "}";
         return dot;
     }
     
-    private String toDotDFS(int i, Node currentNode, String parentName, boolean lowEdge, boolean[] visited)
+    @Override
+    public String toSubDot(String prefix)
     {
-        String currentName = "Node" + i + "_Var" + currentNode.inputIndex;
+        String dot = "subgraph cluster" + prefix + " {\n";
+        dot += dotBody(prefix);
+        dot += "}";
+        return dot;
+    }
+    
+    private String dotBody(String prefix)
+    {
+        String dot = "True [shape=box];\nFalse [shape=box];\n";
+        int r = tree.getRootIndex();
+        boolean[] visited = new boolean[r+1];
+        for (int i = 0; i < r+1; i++)
+            visited[i] = false;
+        return dot + toDotDFS(r, prefix, tree.getNode(r), null, false, visited);
+    }
+    
+    private String toDotDFS(int i, String prefix, Node currentNode, String parentName, boolean lowEdge, boolean[] visited)
+    {
+        String currentName = prefix + "Node" + i + "_Var" + currentNode.inputIndex;
         if (currentNode.isTerminal())
             return parentName + "->" + (currentNode.terminalValue ? "True" : "False") + (lowEdge ? "[style=dashed];\n" : ";\n");
         else
@@ -484,8 +498,8 @@ public class BDD extends Executable implements Graph
                 output += parentName + "->" + currentName + (lowEdge ? "[style=dashed];\n" : ";\n");
             if (!visited[i])
             { // Only visit this nodes children if we haven't been down this route already
-                output += toDotDFS(currentNode.low, tree.getNode(currentNode.low), currentName, true, visited);
-                output += toDotDFS(currentNode.high, tree.getNode(currentNode.high), currentName, false, visited);
+                output += toDotDFS(currentNode.low, prefix, tree.getNode(currentNode.low), currentName, true, visited);
+                output += toDotDFS(currentNode.high, prefix, tree.getNode(currentNode.high), currentName, false, visited);
             }
             visited[i] = true;
             return output;
