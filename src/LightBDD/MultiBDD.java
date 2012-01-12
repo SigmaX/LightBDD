@@ -60,9 +60,9 @@ public class MultiBDD extends Executable
     }
     
     /**
-     * Builds a MultiBDD out of the specified boolean function.
+     * Builds a MultiBDD out of the specified function.
      */
-    public MultiBDD(BooleanFunction f)
+    public MultiBDD(Executable f)
     {
         bdds = new ArrayList<BDD>(f.getNumOutputs());
         for (int i = 0; i < f.getNumOutputs(); i++)

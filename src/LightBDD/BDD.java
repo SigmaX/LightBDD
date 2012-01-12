@@ -56,29 +56,29 @@ public class BDD extends Executable implements Graph
      * @param f Function to clone
      * @param output The function may be multi-output, but a BDD has only one output.  This selects one. 
      */
-    public BDD(BooleanFunction f, int output)
+    public BDD(Executable f, int output)
     {
         this.tree = new BDDTree(f.getNumInputs());
-        buildThisFromBooleanFunction(f, output, new boolean[f.getNumInputs()], 0);
+        buildThisFromFunction(f, output, new boolean[f.getNumInputs()], 0);
     }
     
     public BDD(BooleanFunction f)
     {
         assert(f.getNumOutputs() == 1);
         this.tree = new BDDTree(f.getNumInputs());
-        buildThisFromBooleanFunction(f, 0, new boolean[f.getNumInputs()], 0);
+        buildThisFromFunction(f, 0, new boolean[f.getNumInputs()], 0);
     }
     
-    private int buildThisFromBooleanFunction(BooleanFunction f, int output, boolean[] inputString, int inputIndex)
+    private int buildThisFromFunction(Executable f, int output, boolean[] inputString, int inputIndex)
     {
         if (inputIndex == f.getNumInputs())
             return (f.execute(inputString)[output] ? 1 : 0);
         else
         {
             inputString[inputIndex] = false;
-            int lowChild = buildThisFromBooleanFunction(f, output, inputString, inputIndex + 1);
+            int lowChild = buildThisFromFunction(f, output, inputString, inputIndex + 1);
             inputString[inputIndex] = true;
-            int highChild = buildThisFromBooleanFunction(f, output, inputString, inputIndex + 1);
+            int highChild = buildThisFromFunction(f, output, inputString, inputIndex + 1);
             return mk(new Node(lowChild, highChild, inputIndex));
         }
     }
