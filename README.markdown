@@ -2,7 +2,7 @@
 
 LightBDD is a bare-bones library for building and combining Reduced Ordered Binary Decision Diagrams, which are memory-efficient data structures for storing the truth tables of large boolean functions.
 
-Have a look at the [Example class](tree/master/src/LightBDD/Example.java) too see how it works.
+Have a look at the [Example class](/src/LightBDD/Example.java) too see how it works.
 
 # BDDs
 BDDs are used extensively in logic circuit design software and select computer science problems.  They can be seen as a binary analog to [Directed Acyclic Word Graphs](http://en.wikipedia.org/wiki/Directed_acyclic_word_graph) (DAWGs), which use the same graph-based mechanism to reduced the memory footprint of, for instance, spelling dictionaries.  For more on BDDs, see Henrik Reif Anderson's excellent [Introduction to Binary Decision Diagrams][Anderson]
